@@ -1,3 +1,3 @@
-module github.com/user/rest.serv
+module module github.com/laubli/TpRest/src/internal/entities
 
 go 1.15

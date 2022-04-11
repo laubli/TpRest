@@ -1,4 +1,4 @@
-module github.com/user/rest.serv
+module github.com/laubli/TpRest/src
 
 go 1.15
 
