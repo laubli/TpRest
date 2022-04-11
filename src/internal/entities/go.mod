@@ -1,3 +1,3 @@
-module module github.com/laubli/TpRest/src/internal/entities
+module github.com/TpRest/src/internal/entities
 
 go 1.15
