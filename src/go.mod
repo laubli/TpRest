@@ -1,4 +1,4 @@
-module TpRest
+module github.com/laubli/TpRest
 
 go 1.15
 

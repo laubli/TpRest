@@ -1,3 +1,3 @@
-module TpRest/src/internal/persistence
+module github.com/laubli/TpRest/src/internal/persistence
 
 go 1.15

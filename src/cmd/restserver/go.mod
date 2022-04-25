@@ -1,4 +1,4 @@
-module TpRest/src/cmd/restserver
+module github.com/laubli/TpRest/src/cmd/restserver
 
 go 1.15
 
