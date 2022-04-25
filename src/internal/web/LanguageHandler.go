@@ -2,10 +2,10 @@ package web
 
 import (
 	"encoding/json"
-	. "entities"
 	"fmt"
+	. "internal/entities"
+	. "internal/persistence"
 	"net/http"
-	. "persistence"
 
 	"github.com/gorilla/mux"
 )
