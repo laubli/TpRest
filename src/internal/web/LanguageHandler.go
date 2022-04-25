@@ -2,31 +2,29 @@ package web
 
 import (
 	"encoding/json"
-	"internal/entities"
+	"fmt"
+	. "internal/entities"
 	"net/http"
 )
 
 var (
-	students []entities.Student // slice (dynamically sized array)
+	languages []Language // slice (dynamically sized array)
 )
 
 func init() {
-	students = []entities.Student{entities.Student{
-		Id:          1,
-		FirstName:   "Nom 1",
-		LastName:    "Prénom 1",
-		Age:         20,
-		LangageCode: true,
+	languages = []Language{Language{
+		Code: "1",
+		Name: "Nom 1",
 	}}
 }
 
-func GetPosts(res http.ResponseWriter, req *http.Request) {
+func GetLanguage(res http.ResponseWriter, req *http.Request) {
 
 	// We generally interact with api's in JSON
 	res.Header().Set("Content-type", "application/json")
 
 	// returns the json encoding of posts
-	result, err := json.Marshal(students)
+	result, err := json.Marshal(languages)
 
 	// check for error
 	if err != nil {
@@ -39,14 +37,14 @@ func GetPosts(res http.ResponseWriter, req *http.Request) {
 	res.Write(result)
 }
 
-func AddPost(res http.ResponseWriter, req *http.Request) {
+func AddLanguage(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-type", "application/json")
 
 	// declaring new post of type Post
-	var student entities.Student
+	var language Language
 
 	// reads the JSON value and decodes it into a Go value
-	err := json.NewDecoder(req.Body).Decode(&student)
+	err := json.NewDecoder(req.Body).Decode(&language)
 
 	// check for error
 	if err != nil {
@@ -56,13 +54,26 @@ func AddPost(res http.ResponseWriter, req *http.Request) {
 	}
 
 	// fake ID for the post
-	student.Id = len(students) + 1
+	language.Code = len(languages) + 1
 
 	// appending the post at the end of dummy array
-	students = append(students, student)
+	languages = append(languages, language)
 	res.WriteHeader(http.StatusOK)
 
 	// returns the json encoding of post
-	result, err := json.Marshal(student)
+	result, err := json.Marshal(language)
 	res.Write(result)
+}
+
+func CreateLanguage(res http.ResponseWriter, req *http.Request) {
+	fmt.Fprintf(res, "<html>")
+	fmt.Fprintf(res, "<head>")
+	fmt.Fprintf(res, "</head>")
+	fmt.Fprintf(res, "<body>")
+	fmt.Fprintf(res, "<h1> Création d'un langague </h1>")
+	fmt.Fprintf(res, "<div><label for=\"Code\">Code :</label><input type=\"text\" id=\"codeInput\" value=\" \"> </div>")
+	fmt.Fprintf(res, "<div><label for=\"LastName\">Name :</label><input type=\"text\" id=\"nameInput\" value=\" \">div>")
+	fmt.Fprintf(res, "<div><input type=\"button\" value=\"Submit\"></div>")
+	fmt.Fprintf(res, "</body>")
+	fmt.Fprintf(res, "</html>")
 }

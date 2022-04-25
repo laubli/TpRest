@@ -3,12 +3,12 @@ package entities
 import "fmt"
 
 type Language struct {
-	Code int
+	Code string
 	Name string
 }
 
 func NewLanguage() Language {
-	return Language{0, "name"}
+	return Language{"0", "name"}
 }
 
 func (language Language) String() string {

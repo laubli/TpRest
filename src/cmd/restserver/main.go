@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/laubli/TpRest/src/cmd/restserver/internal/web"
 )
 
 func main() {
@@ -14,8 +15,11 @@ func main() {
 	// base route of the API
 	//router.HandleFunc("/", )
 
-	router.HandleFunc("/students", web.GetPosts).Methods("GET")
-	router.HandleFunc("/students", web.AddPost).Methods("POST")
+	router.HandleFunc("/students", web.GetStudent).Methods("GET")
+	router.HandleFunc("/students", web.AddStudent).Methods("POST")
+	router.HandleFunc("/languages", web.GetLanguage).Methods("GET")
+	router.HandleFunc("/languages", web.AddLanguage).Methods("POST")
+	router.HandleFunc("/language", web.CreateLanguage)
 
 	// logging in terminal
 	log.Println("Server Listening on port", port)
