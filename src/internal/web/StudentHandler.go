@@ -93,7 +93,7 @@ func FindAllStudents(res http.ResponseWriter, req *http.Request) {
 	// We generally interact with api's in JSON
 	res.Header().Set("Content-type", "application/json")
 
-	var studentFind = getAllStudents(res, studentId)
+	var studentFind = findAllStudents(res, studentId)
 	// returns the json encoding of posts
 	result, err := json.Marshal(studentFind)
 
