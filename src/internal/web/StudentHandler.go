@@ -2,9 +2,9 @@ package web
 
 import (
 	"encoding/json"
-	"entities"
+	. "entities"
 	"net/http"
-	"persistence"
+	. "persistence"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -14,7 +14,7 @@ func AddStudent(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-type", "application/json")
 
 	// declaring new post of type Post
-	var student entities.Student
+	var student Student
 
 	// reads the JSON value and decodes it into a Go value
 	err := json.NewDecoder(req.Body).Decode(&student)
@@ -26,7 +26,7 @@ func AddStudent(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if !persistence.CreateStudent(student) {
+	if !CreateStudent(student) {
 		res.WriteHeader(http.StatusInternalServerError)
 		res.Write([]byte(`{"error": "Error student already exist"}`))
 		return
@@ -56,7 +56,7 @@ func GetStudent(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	var studentFind = persistence.FindStudent(studentId)
+	var studentFind = FindStudent(studentId)
 	// returns the json encoding of posts
 	result, err := json.Marshal(studentFind)
 
@@ -75,7 +75,7 @@ func GetAllStudents(res http.ResponseWriter, req *http.Request) {
 	// We generally interact with api's in JSON
 	res.Header().Set("Content-type", "application/json")
 
-	var studentFind = persistence.FindAllStudents()
+	var studentFind = FindAllStudents()
 	// returns the json encoding of posts
 	result, err := json.Marshal(studentFind)
 

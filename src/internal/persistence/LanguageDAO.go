@@ -1,21 +1,21 @@
 package persistence
 
 import (
-	"entities"
+	. "entities"
 )
 
 var (
-	languages []entities.Language // slice (dynamically sized array)
+	languages []Language // slice (dynamically sized array)
 )
 
 func init() {
-	languages = []entities.Language{entities.Language{
+	languages = []Language{Language{
 		Code: "1",
 		Name: "Nom 1",
 	}}
 }
 
-func ExistLanguage(testLanguage entities.Language) (exist bool) {
+func ExistLanguage(testLanguage Language) (exist bool) {
 	for _, singleLanguage := range languages {
 		if singleLanguage.Code == testLanguage.Code {
 			return true
@@ -24,7 +24,7 @@ func ExistLanguage(testLanguage entities.Language) (exist bool) {
 	return false
 }
 
-func CreateLanguage(newLanguage entities.Language) (reussi bool) {
+func CreateLanguage(newLanguage Language) (reussi bool) {
 	var test = false
 	for _, singleLanguage := range languages {
 		if singleLanguage.Code == newLanguage.Code {
@@ -37,8 +37,8 @@ func CreateLanguage(newLanguage entities.Language) (reussi bool) {
 	return test
 }
 
-func FindLanguage(languageCode string) (language *entities.Language) {
-	var returnLanguage entities.Language
+func FindLanguage(languageCode string) (language *Language) {
+	var returnLanguage Language
 
 	for _, singleLanguage := range languages {
 		if singleLanguage.Code == languageCode {
@@ -48,11 +48,11 @@ func FindLanguage(languageCode string) (language *entities.Language) {
 	return &returnLanguage
 }
 
-func FindAllLanguages() (languages []entities.Language) {
+func FindAllLanguages() (languages []Language) {
 	return languages
 }
 
-func UpdateLanguage(updatedLanguage entities.Language) (reussi bool) {
+func UpdateLanguage(updatedLanguage Language) (reussi bool) {
 	for i, singleLanguage := range languages {
 		if singleLanguage.Code == updatedLanguage.Code {
 			singleLanguage.Name = updatedLanguage.Name

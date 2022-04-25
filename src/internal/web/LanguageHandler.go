@@ -2,20 +2,20 @@ package web
 
 import (
 	"encoding/json"
-	"entities"
+	. "entities"
 	"fmt"
 	"net/http"
-	"persistence"
+	. "persistence"
 
 	"github.com/gorilla/mux"
 )
 
 var (
-	languages []entities.Language // slice (dynamically sized array)
+	languages []Language // slice (dynamically sized array)
 )
 
 func init() {
-	languages = []entities.Language{entities.Language{
+	languages = []Language{Language{
 		Code: "1",
 		Name: "Nom 1",
 	}}
@@ -27,7 +27,7 @@ func GetLanguage(res http.ResponseWriter, req *http.Request) {
 
 	languageCode := mux.Vars(req)["Id"]
 
-	var languageFind = persistence.FindLanguage(languageCode)
+	var languageFind = FindLanguage(languageCode)
 	// returns the json encoding of posts
 	result, err := json.Marshal(languageFind)
 
@@ -46,7 +46,7 @@ func AddLanguage(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-type", "application/json")
 
 	// declaring new post of type Post
-	var language entities.Language
+	var language Language
 
 	// reads the JSON value and decodes it into a Go value
 	err := json.NewDecoder(req.Body).Decode(&language)
@@ -58,7 +58,7 @@ func AddLanguage(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if !persistence.CreateLanguage(language) {
+	if !CreateLanguage(language) {
 		res.WriteHeader(http.StatusInternalServerError)
 		res.Write([]byte(`{"error": "Error language already exist"}`))
 		return
@@ -76,7 +76,7 @@ func AddLanguage(res http.ResponseWriter, req *http.Request) {
 	res.Write(result)
 }
 
-func CreateLanguage(res http.ResponseWriter, req *http.Request) {
+func CreateOneLanguage(res http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(res, "<html>")
 	fmt.Fprintf(res, "<head>")
 	fmt.Fprintf(res, "</head>")
@@ -93,7 +93,7 @@ func GetAllLanguage(res http.ResponseWriter, req *http.Request) {
 	// We generally interact with api's in JSON
 	res.Header().Set("Content-type", "application/json")
 
-	var languageFind = persistence.FindAllLanguages()
+	var languageFind = FindAllLanguages()
 	// returns the json encoding of posts
 	result, err := json.Marshal(languageFind)
 

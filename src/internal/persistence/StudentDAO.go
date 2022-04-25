@@ -1,15 +1,15 @@
 package persistence
 
 import (
-	"entities"
+	. "entities"
 )
 
 var (
-	students []entities.Student // slice (dynamically sized array)
+	students []Student // slice (dynamically sized array)
 )
 
 func init() {
-	students = []entities.Student{entities.Student{
+	students = []Student{Student{
 		Id:          1,
 		FirstName:   "Nom 1",
 		LastName:    "Prénom 1",
@@ -18,7 +18,7 @@ func init() {
 	}}
 }
 
-func ExistStudent(testStudent entities.Student) (exist bool) {
+func ExistStudent(testStudent Student) (exist bool) {
 	//reqBody, err := ioutil.ReadAll(r.Body)
 	//if err != nil {
 	//fmt.Fprintf(w, "Erreur")
@@ -33,7 +33,7 @@ func ExistStudent(testStudent entities.Student) (exist bool) {
 	return false
 }
 
-func CreateStudent(newStudent entities.Student) (reussi bool) {
+func CreateStudent(newStudent Student) (reussi bool) {
 	//reqBody, err := ioutil.ReadAll(r.Body)
 	//if err != nil {
 	//fmt.Fprintf(w, "Erreur")
@@ -56,9 +56,9 @@ func CreateStudent(newStudent entities.Student) (reussi bool) {
 	//json.NewEncoder(w).Encode(newStudent)
 }
 
-func FindStudent(studentId int) (student *entities.Student) {
+func FindStudent(studentId int) (student *Student) {
 	//studentId := mux.Vars(r)["Id"]
-	var returnStudent entities.Student
+	var returnStudent Student
 
 	for _, singleStudent := range students {
 		if singleStudent.Id == studentId {
@@ -69,12 +69,12 @@ func FindStudent(studentId int) (student *entities.Student) {
 	return &returnStudent
 }
 
-func FindAllStudents() (students []entities.Student) {
+func FindAllStudents() (students []Student) {
 	//json.NewEncoder(w).Encode(students)
 	return students
 }
 
-func UpdateStudent(updatedStudent entities.Student) (reussi bool) {
+func UpdateStudent(updatedStudent Student) (reussi bool) {
 	//studentId := mux.Vars(r)["Id"]
 
 	//reqBody, err := ioutil.ReadAll(r.Body)
