@@ -74,7 +74,7 @@ func FindStudent(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-type", "application/json")
 
 	studentId := mux.Vars(req)["Id"]
-	var studentFind = persistence.getOneStudent(students, studentId)
+	var studentFind = persistence.StudentDAO.findStudent(studentId)
 	// returns the json encoding of posts
 	result, err := json.Marshal(studentFind)
 
