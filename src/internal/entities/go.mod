@@ -1,5 +1,3 @@
-module github.com/laubli/TpRest/src/internal/entities
+module language
 
-go 1.15
-
-require github.com/gorilla/mux v1.8.0
+go 1.17

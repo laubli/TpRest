@@ -1,19 +1,43 @@
 package entities
 
-import "fmt"
-
 type Student struct {
-	Id          int
-	FirstName   string
-	LastName    string
-	Age         int
-	LangageCode bool
+	Id           int
+	FirstName    string
+	LastName     string
+	Age          int
+	LanguageCode string
 }
 
-func NewStudent() Student {
-	return Student{0, "Fname", "Lname", 10, true}
+type StudentList []Student
+
+func NewStudent(id int, firstName string, lastName string, age int, languageCode string) Student {
+	return Student{
+		Id:           id,
+		FirstName:    firstName,
+		LastName:     lastName,
+		Age:          age,
+		LanguageCode: languageCode,
+	}
 }
 
-func (student Student) String() string {
-	return fmt.Sprint(student.Id) + " " + student.FirstName + " " + student.LastName + " " + fmt.Sprint(student.Age) + " " + fmt.Sprint(student.LangageCode)
+func (l StudentList) Len() int {
+	return len(l)
+}
+
+func (l StudentList) Less(i, j int) bool {
+	return l[i].Id < l[j].Id
+}
+
+func (l StudentList) Swap(i, j int) {
+	l[i], l[j] = l[j], l[i]
+}
+
+func StudentString(student Student) string {
+	return "{" +
+		"	Etudiant number:" + string(rune(student.Id)) +
+		"	First name: " + student.FirstName +
+		"	Last name: " + student.LastName +
+		"	Age: " + string(rune(student.Age)) +
+		"	Language code: " + student.LanguageCode +
+		"}"
 }
