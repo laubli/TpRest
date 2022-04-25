@@ -4,23 +4,11 @@ import (
 	"encoding/json"
 	"entities"
 	"net/http"
+	"persistence"
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
-
-var (
-	students []entities.Student // slice (dynamically sized array)
-)
-
-func init() {
-	students = []entities.Student{entities.Student{
-		Id:          1,
-		FirstName:   "nom1",
-		LastName:    "prenom1",
-		Age:         20,
-		LangageCode: true,
-	}}
-}
 
 func AddStudent(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-type", "application/json")
@@ -38,43 +26,37 @@ func AddStudent(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// fake ID for the post
-	student.Id = len(students) + 1
-
-	// appending the post at the end of dummy array
-	students = append(students, student)
-	res.WriteHeader(http.StatusOK)
+	if !persistence.CreateStudent(student) {
+		res.WriteHeader(http.StatusInternalServerError)
+		res.Write([]byte(`{"error": "Error student already exist"}`))
+		return
+	}
 
 	// returns the json encoding of post
 	result, err := json.Marshal(student)
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		res.Write([]byte(`{"error": "Error unmarshalling the request"}`))
+		return
+	}
+
+	res.WriteHeader(http.StatusOK)
 	res.Write(result)
 }
 
 func GetStudent(res http.ResponseWriter, req *http.Request) {
-
 	// We generally interact with api's in JSON
 	res.Header().Set("Content-type", "application/json")
 
-	// returns the json encoding of posts
-	result, err := json.Marshal(students)
-
-	// check for error
-	if err != nil {
+	studentIdString := mux.Vars(req)["Id"]
+	studentId, errStr := strconv.Atoi(studentIdString)
+	if errStr != nil {
 		res.WriteHeader(http.StatusInternalServerError) // status: 500
-		res.Write([]byte(`{"error": "Error marshalling the student array"}`))
+		res.Write([]byte(`{"error": "Error"}`))
 		return
 	}
 
-	res.WriteHeader(http.StatusOK) // status: 200
-	res.Write(result)
-}
-
-func FindStudent(res http.ResponseWriter, req *http.Request) {
-	// We generally interact with api's in JSON
-	res.Header().Set("Content-type", "application/json")
-
-	studentId := mux.Vars(req)["Id"]
-	var studentFind = persistence.StudentDAO.findStudent(studentId)
+	var studentFind = persistence.FindStudent(studentId)
 	// returns the json encoding of posts
 	result, err := json.Marshal(studentFind)
 
@@ -89,11 +71,11 @@ func FindStudent(res http.ResponseWriter, req *http.Request) {
 	res.Write(result)
 }
 
-func FindAllStudents(res http.ResponseWriter, req *http.Request) {
+func GetAllStudents(res http.ResponseWriter, req *http.Request) {
 	// We generally interact with api's in JSON
 	res.Header().Set("Content-type", "application/json")
 
-	var studentFind = findAllStudents(res, studentId)
+	var studentFind = persistence.FindAllStudents()
 	// returns the json encoding of posts
 	result, err := json.Marshal(studentFind)
 

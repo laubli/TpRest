@@ -5,7 +5,9 @@ import (
 	"entities"
 	"fmt"
 	"net/http"
-	"strconv"
+	"persistence"
+
+	"github.com/gorilla/mux"
 )
 
 var (
@@ -20,17 +22,19 @@ func init() {
 }
 
 func GetLanguage(res http.ResponseWriter, req *http.Request) {
-
 	// We generally interact with api's in JSON
 	res.Header().Set("Content-type", "application/json")
 
+	languageCode := mux.Vars(req)["Id"]
+
+	var languageFind = persistence.FindLanguage(languageCode)
 	// returns the json encoding of posts
-	result, err := json.Marshal(languages)
+	result, err := json.Marshal(languageFind)
 
 	// check for error
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError) // status: 500
-		res.Write([]byte(`{"error": "Error marshalling the student array"}`))
+		res.Write([]byte(`{"error": "Error marshalling the langauge array"}`))
 		return
 	}
 
@@ -54,15 +58,21 @@ func AddLanguage(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// fake ID for the post
-	language.Code = strconv.Itoa(len(languages) + 1)
-
-	// appending the post at the end of dummy array
-	languages = append(languages, language)
-	res.WriteHeader(http.StatusOK)
+	if !persistence.CreateLanguage(language) {
+		res.WriteHeader(http.StatusInternalServerError)
+		res.Write([]byte(`{"error": "Error language already exist"}`))
+		return
+	}
 
 	// returns the json encoding of post
 	result, err := json.Marshal(language)
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		res.Write([]byte(`{"error": "Error unmarshalling the request"}`))
+		return
+	}
+
+	res.WriteHeader(http.StatusOK)
 	res.Write(result)
 }
 
@@ -77,4 +87,23 @@ func CreateLanguage(res http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(res, "<div><input type=\"button\" value=\"Submit\"></div>")
 	fmt.Fprintf(res, "</body>")
 	fmt.Fprintf(res, "</html>")
+}
+
+func GetAllLanguage(res http.ResponseWriter, req *http.Request) {
+	// We generally interact with api's in JSON
+	res.Header().Set("Content-type", "application/json")
+
+	var languageFind = persistence.FindAllLanguages()
+	// returns the json encoding of posts
+	result, err := json.Marshal(languageFind)
+
+	// check for error
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError) // status: 500
+		res.Write([]byte(`{"error": "Error marshalling the language array"}`))
+		return
+	}
+
+	res.WriteHeader(http.StatusOK) // status: 200
+	res.Write(result)
 }

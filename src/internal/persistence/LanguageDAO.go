@@ -1,73 +1,74 @@
 package persistence
 
 import (
-	"encoding/json"
 	"entities"
-	"fmt"
-	"io/ioutil"
-	"net/http"
-
-	"github.com/gorilla/mux"
 )
 
 var (
 	languages []entities.Language // slice (dynamically sized array)
 )
 
-func CreateLanguage(w http.ResponseWriter, r *http.Request) {
-	var newLanguage entities.Language
-	reqBody, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		fmt.Fprintf(w, "Une erreur s'est produit")
-	}
-
-	json.Unmarshal(reqBody, &newLanguage)
-	languages = append(languages, newLanguage)
-	w.WriteHeader(http.StatusCreated)
-
-	json.NewEncoder(w).Encode(newLanguage)
+func init() {
+	languages = []entities.Language{entities.Language{
+		Code: "1",
+		Name: "Nom 1",
+	}}
 }
 
-func getOneLanguage(w http.ResponseWriter, r *http.Request) {
-	languageCode := mux.Vars(r)["id"]
+func ExistLanguage(testLanguage entities.Language) (exist bool) {
+	for _, singleLanguage := range languages {
+		if singleLanguage.Code == testLanguage.Code {
+			return true
+		}
+	}
+	return false
+}
+
+func CreateLanguage(newLanguage entities.Language) (reussi bool) {
+	var test = false
+	for _, singleLanguage := range languages {
+		if singleLanguage.Code == newLanguage.Code {
+			test = true
+		}
+	}
+	if !test {
+		languages = append(languages, newLanguage)
+	}
+	return test
+}
+
+func FindLanguage(languageCode string) (language *entities.Language) {
+	var returnLanguage entities.Language
 
 	for _, singleLanguage := range languages {
 		if singleLanguage.Code == languageCode {
-			json.NewEncoder(w).Encode(singleLanguage)
+			returnLanguage = singleLanguage
 		}
 	}
+	return &returnLanguage
 }
 
-func getAllLanguages(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode(languages)
+func FindAllLanguages() (languages []entities.Language) {
+	return languages
 }
 
-func updateLanguage(w http.ResponseWriter, r *http.Request) {
-	languageCode := mux.Vars(r)["Code"]
-	var updatedLanguage entities.Language
-
-	reqBody, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		fmt.Fprintf(w, "Une erreur s'est produit")
-	}
-	json.Unmarshal(reqBody, &updatedLanguage)
-
+func UpdateLanguage(updatedLanguage entities.Language) (reussi bool) {
 	for i, singleLanguage := range languages {
-		if singleLanguage.Code == languageCode {
+		if singleLanguage.Code == updatedLanguage.Code {
 			singleLanguage.Name = updatedLanguage.Name
 			languages = append(languages[:i], singleLanguage)
-			json.NewEncoder(w).Encode(singleLanguage)
+			return true
 		}
 	}
+	return false
 }
 
-func deleteLanguage(w http.ResponseWriter, r *http.Request) {
-	LanguageCode := mux.Vars(r)["Code"]
-
+func DeleteLanguage(languageCode string) (reussi bool) {
 	for i, singleLanguage := range languages {
-		if singleLanguage.Code == LanguageCode {
+		if singleLanguage.Code == languageCode {
 			languages = append(languages[:i], languages[i+1:]...)
-			fmt.Fprintf(w, "The langauge with code %v has been deleted successfully", LanguageCode)
+			return true
 		}
 	}
+	return false
 }

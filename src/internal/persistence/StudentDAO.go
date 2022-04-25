@@ -18,7 +18,7 @@ func init() {
 	}}
 }
 
-func existStudent(testStudent entities.Student) (exist bool) {
+func ExistStudent(testStudent entities.Student) (exist bool) {
 	//reqBody, err := ioutil.ReadAll(r.Body)
 	//if err != nil {
 	//fmt.Fprintf(w, "Erreur")
@@ -27,13 +27,13 @@ func existStudent(testStudent entities.Student) (exist bool) {
 	//json.Unmarshal(reqBody, &newStudent)
 	for _, singleStudent := range students {
 		if singleStudent.Id == testStudent.Id {
-			return false
+			return true
 		}
 	}
 	return false
 }
 
-func createStudent(newStudent entities.Student) (reussi bool) {
+func CreateStudent(newStudent entities.Student) (reussi bool) {
 	//reqBody, err := ioutil.ReadAll(r.Body)
 	//if err != nil {
 	//fmt.Fprintf(w, "Erreur")
@@ -56,7 +56,7 @@ func createStudent(newStudent entities.Student) (reussi bool) {
 	//json.NewEncoder(w).Encode(newStudent)
 }
 
-func findStudent(studentId int) (student *entities.Student) {
+func FindStudent(studentId int) (student *entities.Student) {
 	//studentId := mux.Vars(r)["Id"]
 	var returnStudent entities.Student
 
@@ -69,12 +69,12 @@ func findStudent(studentId int) (student *entities.Student) {
 	return &returnStudent
 }
 
-func findAllStudents() (students []entities.Student) {
+func FindAllStudents() (students []entities.Student) {
 	//json.NewEncoder(w).Encode(students)
 	return students
 }
 
-func updateStudent(updatedStudent entities.Student) (reussi bool) {
+func UpdateStudent(updatedStudent entities.Student) (reussi bool) {
 	//studentId := mux.Vars(r)["Id"]
 
 	//reqBody, err := ioutil.ReadAll(r.Body)
@@ -97,7 +97,7 @@ func updateStudent(updatedStudent entities.Student) (reussi bool) {
 	return false
 }
 
-func deleteStudent(studentId int) (reussi bool) {
+func DeleteStudent(studentId int) (reussi bool) {
 	//studentId := mux.Vars(r)["id"]
 
 	for i, singleStudent := range students {
