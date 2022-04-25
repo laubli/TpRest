@@ -1,3 +1,3 @@
-module language
+module entities
 
 go 1.17

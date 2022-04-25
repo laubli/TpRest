@@ -2,90 +2,144 @@ package web
 
 import (
 	"encoding/json"
-	. "entities"
+	"fmt"
+	entities "internal/entities/student"
+	"internal/persistence"
+	"io/ioutil"
+	"log"
 	"net/http"
-	. "persistence"
 	"strconv"
 
 	"github.com/gorilla/mux"
 )
 
-func AddStudent(res http.ResponseWriter, req *http.Request) {
-	res.Header().Set("Content-type", "application/json")
+var intStud persistence.StudentDAOMemory
 
-	// declaring new post of type Post
-	var student Student
+//var intStud persistence.StudentDAOBolt
+var stud entities.Student
 
-	// reads the JSON value and decodes it into a Go value
-	err := json.NewDecoder(req.Body).Decode(&student)
+func GetOneStudent(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
 
-	// check for error
+	w.Header().Set("Content-Type", "application/json")
+
+	selectedStudent := intStud.Find(id)
+	if selectedStudent == nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	resp, err := json.Marshal(selectedStudent)
+
+	// Error handling
 	if err != nil {
-		res.WriteHeader(http.StatusInternalServerError)
-		res.Write([]byte(`{"error": "Error unmarshalling the request"}`))
-		return
+		log.Fatalf("Error happened in JSON marshal. Error: %s", err)
 	}
 
-	if !CreateStudent(student) {
-		res.WriteHeader(http.StatusInternalServerError)
-		res.Write([]byte(`{"error": "Error student already exist"}`))
-		return
-	}
-
-	// returns the json encoding of post
-	result, err := json.Marshal(student)
-	if err != nil {
-		res.WriteHeader(http.StatusInternalServerError)
-		res.Write([]byte(`{"error": "Error unmarshalling the request"}`))
-		return
-	}
-
-	res.WriteHeader(http.StatusOK)
-	res.Write(result)
+	w.Write(resp)
 }
 
-func GetStudent(res http.ResponseWriter, req *http.Request) {
-	// We generally interact with api's in JSON
-	res.Header().Set("Content-type", "application/json")
+func GetAllStudent(w http.ResponseWriter, r *http.Request) {
+	// Header
+	w.Header().Set("Content-Type", "application/json")
 
-	studentIdString := mux.Vars(req)["Id"]
-	studentId, errStr := strconv.Atoi(studentIdString)
-	if errStr != nil {
-		res.WriteHeader(http.StatusInternalServerError) // status: 500
-		res.Write([]byte(`{"error": "Error"}`))
-		return
-	}
+	// Body
+	resp, err := json.Marshal(intStud.FindAll())
 
-	var studentFind = FindStudent(studentId)
-	// returns the json encoding of posts
-	result, err := json.Marshal(studentFind)
-
-	// check for error
+	// Error handling
 	if err != nil {
-		res.WriteHeader(http.StatusInternalServerError) // status: 500
-		res.Write([]byte(`{"error": "Error marshalling the student array"}`))
-		return
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Fatalf("Error happened in JSON marshal. Error: %s", err)
 	}
 
-	res.WriteHeader(http.StatusOK) // status: 200
-	res.Write(result)
+	// Send respond
+	w.WriteHeader(http.StatusFound)
+	w.Write(resp)
+	return
 }
 
-func GetAllStudents(res http.ResponseWriter, req *http.Request) {
-	// We generally interact with api's in JSON
-	res.Header().Set("Content-type", "application/json")
+func CreateStudentHandler(w http.ResponseWriter, r *http.Request) {
+	// Header
+	w.Header().Set("Content-Type", "application/json")
 
-	var studentFind = FindAllStudents()
-	// returns the json encoding of posts
-	result, err := json.Marshal(studentFind)
+	// Parsing json
+	reqBody, err := ioutil.ReadAll(r.Body)
 
-	// check for error
+	// Error handling parsing r.Body
 	if err != nil {
-		res.WriteHeader(http.StatusInternalServerError) // status: 500
-		res.Write([]byte(`{"error": "Error marshalling the student array"}`))
+		w.WriteHeader(http.StatusNotModified)
+		fmt.Fprintf(w, "Error: cannot read body: %s", err)
 		return
 	}
 
-	res.WriteHeader(http.StatusOK) // status: 200
-	res.Write(result)
+	err = json.Unmarshal(reqBody, &stud)
+
+	// Error handling when unmarshaling json
+	if err != nil {
+		w.WriteHeader(http.StatusNotModified)
+		fmt.Fprintf(w, "Error: cannot unmarshal json: %s", err)
+		return
+	}
+
+	// Body
+	if !intStud.Create(stud) {
+		// Student already exist
+		w.WriteHeader(http.StatusNotModified)
+		fmt.Fprintf(w, "Student already exist")
+		return
+	}
+
+	// Student successfully created
+	w.WriteHeader(http.StatusCreated)
+}
+
+func UpdateStudentHandler(w http.ResponseWriter, r *http.Request) {
+	// Header
+	w.Header().Set("Content-Type", "application/json")
+
+	// Parsing json
+	reqBody, err := ioutil.ReadAll(r.Body)
+
+	// Error handling parsing r.Body
+	if err != nil {
+		w.WriteHeader(http.StatusNotModified)
+		fmt.Fprintf(w, "Error: cannot read body: %s", err)
+		return
+	}
+
+	err = json.Unmarshal(reqBody, &stud)
+
+	// Error handling when unmarshaling json
+	if err != nil {
+		w.WriteHeader(http.StatusNotModified)
+		fmt.Fprintf(w, "Error: cannot unmarshal json: %s", err)
+		return
+	}
+
+	// Update the Student
+	if intStud.Update(stud) {
+		w.WriteHeader(http.StatusAccepted)
+		fmt.Fprintf(w, "Success: Student modified")
+		return
+	}
+
+	// Status
+	w.WriteHeader(http.StatusNotModified)
+	fmt.Fprintf(w, "Error: Student doesn't exist")
+}
+
+func DeleteStudentByIdHandler(w http.ResponseWriter, r *http.Request) {
+	// Try to delete
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+
+	if intStud.Delete(id) {
+		// Status success
+		w.WriteHeader(http.StatusAccepted)
+		fmt.Fprintf(w, "Success: Student deleted")
+		return
+	}
+
+	// Status error
+	w.WriteHeader(http.StatusNotFound)
+	fmt.Fprintf(w, "Error: Student doesn't exist")
 }

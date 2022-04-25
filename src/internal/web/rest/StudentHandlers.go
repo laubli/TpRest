@@ -3,65 +3,61 @@ package web
 import (
 	"encoding/json"
 	"fmt"
-	entities "internal/entities/language"
+	entities "internal/entities/student"
 	"internal/persistence"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
 
-// In case you want to use the memory implementation, use this line of code instead of the next one
-var intLang persistence.LanguageDAOMemory
+var intStud persistence.StudentDAOMemory
+//var intStud persistence.StudentDAOBolt
+var stud entities.Student
 
-//var intLang persistence.LanguageDAOBolt
-var lang entities.Language
-
-func GetOneLanguage(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("je suis 1")
-	selectedLanguage := intLang.Find(mux.Vars(r)["code"])
+func GetOneStudent(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
 
 	w.Header().Set("Content-Type", "application/json")
 
-	if selectedLanguage == nil {
+	selectedStudent := intStud.Find(id)
+	if selectedStudent == nil {
 		w.WriteHeader(http.StatusNotFound)
-		fmt.Println("je suis 2")
 		return
 	}
 
-	resp, err := json.Marshal(selectedLanguage)
+	resp, err := json.Marshal(selectedStudent)
 
 	// Error handling
 	if err != nil {
 		log.Fatalf("Error happened in JSON marshal. Error: %s", err)
-		fmt.Println("je suis 3")
 	}
 
 	w.Write(resp)
 }
 
-func GetAllLanguage(w http.ResponseWriter, r *http.Request) {
+func GetAllStudent(w http.ResponseWriter, r *http.Request) {
 	// Header
 	w.Header().Set("Content-Type", "application/json")
 
 	// Body
-	resp, err := json.Marshal(intLang.FindAll())
+	resp, err := json.Marshal(intStud.FindAll())
 
 	// Error handling
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "Error happened in JSON marshal. Error: %s", err)
+		log.Fatalf("Error happened in JSON marshal. Error: %s", err)
 	}
 
 	// Send respond
 	w.WriteHeader(http.StatusFound)
 	w.Write(resp)
-
 	return
 }
 
-func CreateLanguageHandler(w http.ResponseWriter, r *http.Request) {
+func CreateStudentHandler(w http.ResponseWriter, r *http.Request) {
 	// Header
 	w.Header().Set("Content-Type", "application/json")
 
@@ -75,7 +71,7 @@ func CreateLanguageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = json.Unmarshal(reqBody, &lang)
+	err = json.Unmarshal(reqBody, &stud)
 
 	// Error handling when unmarshaling json
 	if err != nil {
@@ -85,18 +81,18 @@ func CreateLanguageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Body
-	if !intLang.Create(lang) {
-		// Language already exist
+	if !intStud.Create(stud) {
+		// Student already exist
 		w.WriteHeader(http.StatusNotModified)
-		fmt.Fprintf(w, "Language already exist")
+		fmt.Fprintf(w, "Student already exist")
 		return
 	}
 
-	// Language successfully created
+	// Student successfully created
 	w.WriteHeader(http.StatusCreated)
 }
 
-func UpdateLanguageHandler(w http.ResponseWriter, r *http.Request) {
+func UpdateStudentHandler(w http.ResponseWriter, r *http.Request) {
 	// Header
 	w.Header().Set("Content-Type", "application/json")
 
@@ -106,41 +102,43 @@ func UpdateLanguageHandler(w http.ResponseWriter, r *http.Request) {
 	// Error handling parsing r.Body
 	if err != nil {
 		w.WriteHeader(http.StatusNotModified)
-		fmt.Fprintf(w, "Error: cannot read body")
+		fmt.Fprintf(w, "Error: cannot read body: %s", err)
 		return
 	}
 
-	err = json.Unmarshal(reqBody, &lang)
+	err = json.Unmarshal(reqBody, &stud)
 
 	// Error handling when unmarshaling json
 	if err != nil {
 		w.WriteHeader(http.StatusNotModified)
-		fmt.Fprintf(w, "Error: cannot unmarshal json")
+		fmt.Fprintf(w, "Error: cannot unmarshal json: %s", err)
 		return
 	}
 
-	// Update the language
-	if intLang.Update(lang) {
+	// Update the Student
+	if intStud.Update(stud) {
 		w.WriteHeader(http.StatusAccepted)
-		fmt.Fprintf(w, "Success: language modified")
+		fmt.Fprintf(w, "Success: Student modified")
 		return
 	}
 
-	// Cannot be modified: Language cannot exist
+	// Status
 	w.WriteHeader(http.StatusNotModified)
-	fmt.Fprintf(w, "Error: language doesn't exist")
+	fmt.Fprintf(w, "Error: Student doesn't exist")
 }
 
-func DeleteLanguageByIdHandler(w http.ResponseWriter, r *http.Request) {
+func DeleteStudentByIdHandler(w http.ResponseWriter, r *http.Request) {
 	// Try to delete
-	if intLang.Delete(mux.Vars(r)["code"]) {
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+
+	if intStud.Delete(id) {
 		// Status success
 		w.WriteHeader(http.StatusAccepted)
-		fmt.Fprintf(w, "Success: language deleted")
+		fmt.Fprintf(w, "Success: Student deleted")
 		return
 	}
 
 	// Status error
 	w.WriteHeader(http.StatusNotFound)
-	fmt.Fprintf(w, "Error: language doesn't exist")
+	fmt.Fprintf(w, "Error: Student doesn't exist")
 }

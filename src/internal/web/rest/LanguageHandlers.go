@@ -26,7 +26,7 @@ func GetOneLanguage(w http.ResponseWriter, r *http.Request) {
 
 	if selectedLanguage == nil {
 		w.WriteHeader(http.StatusNotFound)
-		fmt.Println("je suis 2")
+			fmt.Println("je suis 2")
 		return
 	}
 
@@ -35,7 +35,7 @@ func GetOneLanguage(w http.ResponseWriter, r *http.Request) {
 	// Error handling
 	if err != nil {
 		log.Fatalf("Error happened in JSON marshal. Error: %s", err)
-		fmt.Println("je suis 3")
+			fmt.Println("je suis 3")
 	}
 
 	w.Write(resp)
