@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/laubli/TpRest/src/cmd/restserver/internal/web"
+	"github.com/laubli/TpRest/src/internal/web"
 )
 
 func main() {
