@@ -2,20 +2,21 @@ package persistence
 
 import (
 	"encoding/json"
+	"entities"
 	"fmt"
-	. "internal/entities"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
 
 var (
-	students []Student // slice (dynamically sized array)
+	students []entities.Student // slice (dynamically sized array)
 )
 
 func init() {
-	students = []Student{entities.Student{
+	students = []entities.Student{entities.Student{
 		Id:          1,
 		FirstName:   "Nom 1",
 		LastName:    "Prénom 1",
@@ -25,7 +26,7 @@ func init() {
 }
 
 func createStudent(w http.ResponseWriter, r *http.Request) {
-	var newStudent Student
+	var newStudent entities.Student
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		fmt.Fprintf(w, "Erreur")
@@ -38,26 +39,23 @@ func createStudent(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(newStudent)
 }
 
-func getOneStudent(students []Student, studentId int) (student Student) {
-	//studentId := mux.Vars(r)["Id"]
-	var returnStudent Student
+func getOneStudent(w http.ResponseWriter, r *http.Request) {
+	studentId := mux.Vars(r)["Id"]
 
 	for _, singleStudent := range students {
-		if singleStudent.Id == studentId {
-			returnStudent = singleStudent
-			//json.NewEncoder(w).Encode(singleStudent)
+		if strconv.Itoa(singleStudent.Id) == studentId {
+			json.NewEncoder(w).Encode(singleStudent)
 		}
 	}
-	return returnStudent
 }
 
-func getAllStudents(w http.ResponseWriter, r *http.Request) (students []Student) {
+func getAllStudents(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(students)
 }
 
 func updateStudent(w http.ResponseWriter, r *http.Request) {
 	studentId := mux.Vars(r)["Id"]
-	var updatedStudent Student
+	var updatedStudent entities.Student
 
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -66,7 +64,7 @@ func updateStudent(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(reqBody, &updatedStudent)
 
 	for i, singleStudent := range students {
-		if singleStudent.Id == studentId {
+		if strconv.Itoa(singleStudent.Id) == studentId {
 			singleStudent.FirstName = updatedStudent.FirstName
 			singleStudent.LastName = updatedStudent.LastName
 			singleStudent.Age = updatedStudent.Age
@@ -80,8 +78,8 @@ func updateStudent(w http.ResponseWriter, r *http.Request) {
 func deleteStudent(w http.ResponseWriter, r *http.Request) {
 	studentId := mux.Vars(r)["id"]
 
-	for i, singleStudent := range evestudentsnts {
-		if singleStudent.Id == studentId {
+	for i, singleStudent := range students {
+		if strconv.Itoa(singleStudent.Id) == studentId {
 			students = append(students[:i], students[i+1:]...)
 			fmt.Fprintf(w, "The student with Id %v has been deleted successfully", studentId)
 		}

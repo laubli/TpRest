@@ -2,17 +2,31 @@ package web
 
 import (
 	"encoding/json"
-	. "internal/entities"
+	"entities"
 	"net/http"
 
 	"github.com/gorilla/mux"
 )
 
+var (
+	students []entities.Student // slice (dynamically sized array)
+)
+
+func init() {
+	students = []entities.Student{entities.Student{
+		Id:          1,
+		FirstName:   "nom1",
+		LastName:    "prenom1",
+		Age:         20,
+		LangageCode: true,
+	}}
+}
+
 func AddStudent(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-type", "application/json")
 
 	// declaring new post of type Post
-	var student Student
+	var student entities.Student
 
 	// reads the JSON value and decodes it into a Go value
 	err := json.NewDecoder(req.Body).Decode(&student)
@@ -60,7 +74,7 @@ func FindStudent(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-type", "application/json")
 
 	studentId := mux.Vars(req)["Id"]
-	var studentFind = getOneStudent(students, studentId)
+	var studentFind = persistence.getOneStudent(students, studentId)
 	// returns the json encoding of posts
 	result, err := json.Marshal(studentFind)
 

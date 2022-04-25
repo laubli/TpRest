@@ -2,16 +2,20 @@ package persistence
 
 import (
 	"encoding/json"
+	"entities"
 	"fmt"
-	. "internal/entities"
 	"io/ioutil"
 	"net/http"
 
 	"github.com/gorilla/mux"
 )
 
+var (
+	languages []entities.Language // slice (dynamically sized array)
+)
+
 func CreateLanguage(w http.ResponseWriter, r *http.Request) {
-	var newLanguage Language
+	var newLanguage entities.Language
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		fmt.Fprintf(w, "Une erreur s'est produit")
@@ -25,7 +29,7 @@ func CreateLanguage(w http.ResponseWriter, r *http.Request) {
 }
 
 func getOneLanguage(w http.ResponseWriter, r *http.Request) {
-	eventID := mux.Vars(r)["id"]
+	languageCode := mux.Vars(r)["id"]
 
 	for _, singleLanguage := range languages {
 		if singleLanguage.Code == languageCode {
@@ -40,7 +44,7 @@ func getAllLanguages(w http.ResponseWriter, r *http.Request) {
 
 func updateLanguage(w http.ResponseWriter, r *http.Request) {
 	languageCode := mux.Vars(r)["Code"]
-	var updatedLanguage Language
+	var updatedLanguage entities.Language
 
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {

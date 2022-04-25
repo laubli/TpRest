@@ -2,17 +2,18 @@ package web
 
 import (
 	"encoding/json"
+	"entities"
 	"fmt"
-	. "internal/entities"
 	"net/http"
+	"strconv"
 )
 
 var (
-	languages []Language // slice (dynamically sized array)
+	languages []entities.Language // slice (dynamically sized array)
 )
 
 func init() {
-	languages = []Language{Language{
+	languages = []entities.Language{entities.Language{
 		Code: "1",
 		Name: "Nom 1",
 	}}
@@ -41,7 +42,7 @@ func AddLanguage(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-type", "application/json")
 
 	// declaring new post of type Post
-	var language Language
+	var language entities.Language
 
 	// reads the JSON value and decodes it into a Go value
 	err := json.NewDecoder(req.Body).Decode(&language)
@@ -54,7 +55,7 @@ func AddLanguage(res http.ResponseWriter, req *http.Request) {
 	}
 
 	// fake ID for the post
-	language.Code = len(languages) + 1
+	language.Code = strconv.Itoa(len(languages) + 1)
 
 	// appending the post at the end of dummy array
 	languages = append(languages, language)
